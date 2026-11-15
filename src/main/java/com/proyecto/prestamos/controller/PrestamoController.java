@@ -31,7 +31,7 @@ public class PrestamoController {
     @GetMapping("/mios")
     public List<PrestamoDTO> mios(Authentication auth) { return servicio.mios(auth.getName()); }
 
-    @PostMapping @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/solicitar") @ResponseStatus(HttpStatus.CREATED)
     public PrestamoDTO prestar(@RequestBody PrestamoRequest datos) { return servicio.prestar(datos); }
 
     // La multa la calcula el servidor según el perfil; el cliente no envía importes.
