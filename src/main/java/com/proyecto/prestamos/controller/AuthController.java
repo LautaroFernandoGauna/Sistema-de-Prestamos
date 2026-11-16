@@ -2,6 +2,11 @@ package com.proyecto.prestamos.controller;
 
 import javax.naming.AuthenticationException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +33,7 @@ import com.proyecto.prestamos.service.TokenRevocationService;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Autenticación", description = "Registro, inicio de sesión y administración de la sesión JWT.")
 public class AuthController {
 
     private final AuthenticationManager manager;
@@ -49,11 +55,22 @@ public class AuthController {
     // Registro público: siempre crea una cuenta USER con perfil ALUMNO.
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Registrar una cuenta", description = "Crea una cuenta de usuario con perfil de alumno.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Cuenta creada correctamente."),
+            @ApiResponse(responseCode = "400", description = "Los datos enviados no son válidos."),
+            @ApiResponse(responseCode = "409", description = "El usuario o el correo ya están registrados.")
+    })
     public SolicitanteDTO registrarse(@RequestBody RegistroRequest datos) {
         return solicitantes.registrar(datos);
     }
 
     @PostMapping("/signin")
+    @Operation(summary = "Iniciar sesión", description = "Valida las credenciales y devuelve un token JWT.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Credenciales válidas; se devuelve el token."),
+            @ApiResponse(responseCode = "401", description = "Usuario o contraseña incorrectos.")
+    })
     public TokenResponse ingresar(@RequestBody LoginRequest datos) {
         Authentication auth = manager.authenticate(
                 new UsernamePasswordAuthenticationToken(datos.username(), datos.password()));
@@ -62,12 +79,24 @@ public class AuthController {
     }
 
     @GetMapping("/me")
+    @Operation(summary = "Consultar la sesión actual", description = "Devuelve el usuario y los roles asociados al token.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sesión autenticada."),
+            @ApiResponse(responseCode = "401", description = "Token ausente, inválido o vencido.")
+    })
     public SesionDTO miSesion(Authentication auth) {
         return new SesionDTO(auth.getName(),
                 auth.getAuthorities().stream().map(a -> a.getAuthority()).toList(), "Autenticado");
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Cerrar sesión", description = "Revoca el token JWT enviado en la cabecera Authorization.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Token revocado correctamente."),
+            @ApiResponse(responseCode = "401", description = "Token ausente, inválido o vencido.")
+    })
     public String salir(@RequestHeader("Authorization") String authorization) {
         // Solo llega aquí cuando el filtro JWT autenticó la petición.
         revocacion.revoke(authorization.substring(7));
