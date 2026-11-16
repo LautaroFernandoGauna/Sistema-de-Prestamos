@@ -14,8 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.proyecto.prestamos.service.ReporteService;
 import com.proyecto.prestamos.template.Reporte;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController 
 @RequestMapping ("/reportes")
+@Tag(name = "Reportes", description = "Consulta y descarga de reportes de préstamos.")
+@SecurityRequirement(name = "bearerAuth")
 public class ReporteController {
 
      private final ReporteService servicio;
@@ -23,13 +32,28 @@ public class ReporteController {
     public ReporteController(ReporteService servicio) { this.servicio = servicio; }
 
     @GetMapping
+            @Operation(summary = "Listar reportes", description = "Devuelve las claves de los reportes disponibles.")
+    @ApiResponse(responseCode = "200", description = "Claves de reportes disponibles.")
     public List<String> claves() { return servicio.claves(); }
 
     @GetMapping("/{clave}")
-    public Reporte ver(@PathVariable String clave) { return servicio.generar(clave); }
+    @Operation(summary = "Consultar un reporte", description = "Genera el reporte identificado por su clave.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Reporte generado."),
+            @ApiResponse(responseCode = "404", description = "No existe un reporte con esa clave.")
+    })
+    public Reporte ver(@Parameter(description = "Clave del reporte.", example = "prestamos-activos") @PathVariable String clave) {
+        return servicio.generar(clave);
+    }
 
     @GetMapping("/{clave}/csv")
-    public ResponseEntity<byte[]> csv(@PathVariable String clave) {
+    @Operation(summary = "Descargar un reporte CSV", description = "Descarga el reporte como un archivo CSV codificado en UTF-8.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Archivo CSV generado."),
+            @ApiResponse(responseCode = "404", description = "No existe un reporte con esa clave.")
+    })
+    public ResponseEntity<byte[]> csv(
+            @Parameter(description = "Clave del reporte.", example = "prestamos-activos") @PathVariable String clave) {
         byte[] contenido = servicio.csv(clave).getBytes(StandardCharsets.UTF_8);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=\"reporte-" + clave + ".csv\"")
