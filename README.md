@@ -23,7 +23,6 @@ Aplicación web para gestionar el préstamo de **notebooks, proyectores y tablet
 - [Códigos de respuesta](#códigos-de-respuesta)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Limitaciones y mejoras pendientes](#limitaciones-y-mejoras-pendientes)
-- [Autores](#autores)
 
 ## Características
 
@@ -262,7 +261,3 @@ src/main
 - **Persistencia:** H2 en memoria pierde los datos al reiniciar. Para producción, usar una base de datos persistente.
 - **Secretos:** mover `jwt.secret` y las credenciales a variables de entorno.
 - **Pruebas:** agregar pruebas automatizadas.
-
-## Autores
-
-Proyecto desarrollado por **Gauna** y **Leiva**.
