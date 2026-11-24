@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Préstamo de equipos</title>
+<style>
+:root{--bg:#f3f1ec;--card:#fff;--ink:#17262b;--mut:#66767a;--line:#e0ddd4;--ac:#0b6e5f;--ac2:#e2f1ed;--amb:#f2b134;--bad:#b3261e;--warn:#9a5b00;--ok:#2e6b2e;--side:#0e2e2a;
+--serif:"Iowan Old Style","Palatino Linotype",Georgia,serif;--sh:0 1px 2px rgba(20,40,40,.06),0 6px 18px rgba(20,40,40,.05)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Segoe UI",system-ui,-apple-system,sans-serif}
+[hidden]{display:none!important}
+h1,h2,h3{margin:0;font-family:var(--serif);font-weight:600;letter-spacing:-.01em}
+.muted{color:var(--mut)}
+button,input,select{font:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:14px}
+input,select{display:block;width:100%;margin-top:5px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+input:focus,select:focus{border-color:var(--ac)}
+.row{display:flex;gap:12px}.row>*{flex:1}
+.btn{padding:9px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block;transition:background .15s}
+.btn:hover{background:var(--ac2)}
+.btn.primary{background:var(--ac);border-color:var(--ac);color:#fff}.btn.primary:hover{background:#095a4e}
+.btn.amber{background:var(--amb);border-color:var(--amb);color:#2b2100;font-weight:600}.btn.amber:hover{background:#e6a21f}
+.btn.danger{color:var(--bad);border-color:#ecc9c5}.btn.danger:hover{background:#fbeceb}
+.btn.ghost{border-color:#2d5a53;background:transparent;color:#cfe3de;width:100%;margin-top:12px}.btn.ghost:hover{background:#1a433c}
+.btn.sm{padding:4px 10px;font-size:13px}
+/* Acceso */
+.auth{min-height:100vh;display:grid;grid-template-columns:1.1fr 1fr}
+.auth[hidden]{display:none}
+.auth-hero{background:var(--side);color:#e8f1ef;padding:56px 56px;display:flex;flex-direction:column;justify-content:center;gap:20px;
+background-image:radial-gradient(circle at 85% 12%,rgba(242,177,52,.18),transparent 38%),radial-gradient(circle at 10% 95%,rgba(11,110,95,.5),transparent 45%)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--amb)}
+.auth-hero h1{font-size:38px;line-height:1.15;max-width:15ch}
+.auth-hero p{margin:0;color:#b9d2cd;max-width:42ch}
+.plazos{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:10px;max-width:420px}
+.plazos li{border-left:3px solid var(--amb);padding:2px 0 2px 14px}
+.plazos b{display:block}.plazos span{color:#b9d2cd;font-size:14px}
+.auth-card{padding:56px;display:flex;flex-direction:column;justify-content:center;max-width:460px;width:100%;margin:0 auto}
+.auth-card h2{font-size:28px;margin-bottom:16px}
+.auth-card .btn{width:100%;padding:11px}
+.tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tab{background:none;border:0;padding:9px 16px;cursor:pointer;color:var(--mut);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--ac);border-color:var(--ac);font-weight:600}
+.msg{min-height:20px;margin:12px 0 0;font-size:14px;color:var(--bad)}
+/* Aplicación */
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+aside{background:var(--side);color:#e8f1ef;padding:22px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:20px;font-weight:600;padding:0 10px 22px;color:var(--amb)}
+nav{display:flex;flex-direction:column;gap:3px;flex:1}
+nav a{display:flex;align-items:center;gap:11px;color:#cfe3de;text-decoration:none;padding:10px 12px;border-radius:8px}
+nav a:hover{background:#1a433c}nav a.on{background:#e2f1ed;color:#0b3d35;font-weight:600}
+.who{border-top:1px solid #25514a;padding-top:16px}
+.who-row{display:flex;gap:12px;align-items:center}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--amb);color:#2b2100;display:grid;place-items:center;font-weight:700;font-size:14px}
+.content{padding:30px 38px;min-width:0}
+.content>header{margin-bottom:22px}.content h2{font-size:28px}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:var(--side);color:#fff;border-radius:14px;padding:26px 30px;margin-bottom:18px;
+background-image:radial-gradient(circle at 90% 20%,rgba(242,177,52,.22),transparent 40%)}
+.hero h3{font-size:24px}.hero p{margin:4px 0 0;color:#b9d2cd}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:26px}
+.stat{background:var(--card);border-radius:12px;padding:16px 18px;box-shadow:var(--sh);border-top:3px solid var(--ac)}
+.stat.ok{border-color:#3f9a4a}.stat.warn{border-color:var(--amb)}.stat.bad{border-color:var(--bad)}
+.stat b{display:block;font-family:var(--serif);font-size:34px;line-height:1.1}.stat span{color:var(--mut);font-size:13px}
+.stat.bad b{color:var(--bad)}
+.sec{margin:6px 0 12px;font-size:19px}
+.card{background:var(--card);border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:var(--sh)}
+.card h3{margin:0 0 14px;font-size:18px}
+.tablewrap{overflow-x:auto;background:var(--card);border-radius:12px;box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;color:var(--mut);background:#faf9f6;font-size:13px}
+tr:last-child td{border-bottom:0}tbody tr:hover{background:#faf9f6}
+.empty{padding:32px;text-align:center;color:var(--mut)}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;background:var(--ac2);color:var(--ac);font-weight:600}
+.badge.DISPONIBLE,.badge.DEVUELTO{background:#e3f1e3;color:var(--ok)}
+.badge.PRESTADO,.badge.ACTIVO{background:#e4eef8;color:#1b4f84}
+.badge.EN_REPARACION{background:#fdf0dc;color:var(--warn)}
+.badge.vencido{background:#fbeceb;color:var(--bad)}
+.inline{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}.inline label{flex:1;min-width:160px;margin:0}
+.toolbar{display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap}
+.toolbar input[type=search]{flex:1;min-width:220px;margin:0}.toolbar select{width:auto;margin:0}
+.chk{display:flex;align-items:center;gap:8px;margin:0;font-size:14px;color:var(--ink)}.chk input{width:auto;margin:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.eq{display:flex;gap:14px;background:var(--card);border-radius:12px;padding:16px;box-shadow:var(--sh)}
+.eq-ic{flex:none;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--ac2);color:var(--ac)}
+.eq-ic svg{width:24px;height:24px}
+.eq-ic.PRESTADO{background:#e4eef8;color:#1b4f84}.eq-ic.EN_REPARACION{background:#fdf0dc;color:var(--warn)}
+.eq-body{flex:1;min-width:0}.eq-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.act{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+#toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:9}
+.toast{background:var(--side);color:#fff;padding:11px 16px;border-radius:8px;max-width:340px;box-shadow:var(--sh)}.toast.err{background:var(--bad)}
+@media(max-width:860px){.auth{grid-template-columns:1fr}.auth-hero{padding:32px 24px}.auth-hero h1{font-size:28px}.auth-card{padding:28px 24px}
+.shell{grid-template-columns:1fr}aside{position:static;height:auto}nav{flex-direction:row;flex-wrap:wrap}.content{padding:20px 16px}.row{flex-direction:column;gap:0}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="auth" class="auth">
+  <section class="auth-hero">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/></svg>
+      Préstamo de equipos
+    </div>
+    <h1>Retirá lo que necesitás para cursar y enseñar.</h1>
+    <p>Notebooks, proyectores y tablets de la universidad, con plazos claros según tu perfil.</p>
+    <ul class="plazos">
+      <li><b>Alumno</b><span>3 días · multa de $500 por día de atraso</span></li>
+      <li><b>Docente</b><span>7 días · multa fija de $2.000 si hay atraso</span></li>
+      <li><b>Staff</b><span>7 días · sin multa</span></li>
+    </ul>
+  </section>
+  <section class="auth-card">
+    <h2>Bienvenido</h2>
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-t="login">Ingresar</button>
+      <button class="tab" data-t="signup">Crear cuenta</button>
+    </div>
+    <form id="f-login">
+      <label>Usuario<input name="username" required autocomplete="username"></label>
+      <label>Contraseña<input name="password" type="password" required autocomplete="current-password"></label>
+      <button class="btn primary">Ingresar</button>
+    </form>
+    <form id="f-signup" hidden>
+      <div class="row"><label>Nombre<input name="nombre" required></label><label>Apellido<input name="apellido"></label></div>
+      <label>Correo<input name="email" type="email" required></label>
+      <label>Usuario<input name="username" required autocomplete="username"></label>
+      <label>Contraseña (mínimo 8 caracteres)<input name="password" type="password" minlength="8" required autocomplete="new-password"></label>
+      <button class="btn primary">Crear cuenta</button>
+    </form>
+    <p id="auth-msg" class="msg" role="alert"></p>
+  </section>
+</main>
+
+<div id="app" class="shell" hidden>
+  <aside>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/></svg>
+      Préstamos
+    </div>
+    <nav id="nav"></nav>
+    <div class="who">
+      <div class="who-row"><span id="avatar" class="avatar"></span>
+        <div><strong id="who-name"></strong><br><span id="who-role" class="badge"></span></div></div>
+      <button id="logout" class="btn ghost">Cerrar sesión</button>
+    </div>
+  </aside>
+  <section class="content">
+    <header><h2 id="title"></h2></header>
+    <div id="view"></div>
+  </section>
+</div>
+<div id="toasts" aria-live="polite"></div>
+<noscript><p style="padding:20px">Esta aplicación necesita JavaScript.</p></noscript>
+<script>
+'use strict';
+/* Front-end del Sistema de Préstamos. JS puro, sin dependencias. */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => '$' + Number(n || 0).toLocaleString('es-AR');
+const fecha = f => f ? f.split('-').reverse().join('/') : '-';
+const badge = (t, c = t) => `<span class="badge ${esc(c)}">${esc(String(t).replace('_', ' '))}</span>`;
+
+const sesion = {
+  get token() { return sessionStorage.getItem('token'); },
+  get user() { return JSON.parse(sessionStorage.getItem('user') || 'null'); },
+  set(t, u) { sessionStorage.setItem('token', t); sessionStorage.setItem('user', JSON.stringify(u)); },
+  clear() { sessionStorage.clear(); }
+};
+
+const ICON = {"inicio": "<svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 11l9-8 9 8\"/><path d=\"M5 10v10h14V10\"/></svg>", "equipos": "<svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"12\" rx=\"2\"/><path d=\"M2 20h20\"/></svg>", "prestamos": "<svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 7h13l-3-3M20 17H7l3 3\"/></svg>", "solicitantes": "<svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"9\" cy=\"8\" r=\"3.5\"/><path d=\"M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M18 14.5a6.5 6.5 0 013.5 5.5\"/></svg>", "reportes": "<svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 20V10M12 20V4M19 20v-7\"/></svg>", "mios": "<svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"/><path d=\"M9 8h6M9 12h6M9 16h3\"/></svg>", "perfil": "<svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21a8 8 0 0116 0\"/></svg>", "NOTEBOOK": "<svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"4\" y=\"5\" width=\"16\" height=\"11\" rx=\"1.5\"/><path d=\"M2 19h20\"/></svg>", "PROYECTOR": "<svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"2\" y=\"8\" width=\"20\" height=\"9\" rx=\"2\"/><circle cx=\"15\" cy=\"12.5\" r=\"2.5\"/><path d=\"M6 17v2M18 17v2\"/></svg>", "TABLET": "<svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"5\" y=\"2.5\" width=\"14\" height=\"19\" rx=\"2\"/><path d=\"M11 18.5h2\"/></svg>"};
+
+/* ---------- API ---------- */
+const MENSAJES = {400:'Los datos enviados no son válidos.',401:'Sesión vencida o credenciales incorrectas.',
+  403:'No tenés permiso para esta acción.',404:'No se encontró el recurso.',409:'La operación entra en conflicto con el estado actual.'};
+
+async function api(path, { method = 'GET', body, raw } = {}) {
+  const h = {};
+  if (body) h['Content-Type'] = 'application/json';
+  if (sesion.token) h.Authorization = 'Bearer ' + sesion.token;
+  let res;
+  try { res = await fetch(path, { method, headers: h, body: body ? JSON.stringify(body) : undefined }); }
+  catch { throw new Error('No hay conexión con el servidor.'); }
+  if (res.status === 401 && sesion.token && !path.includes('/signin')) { salir(true); throw new Error(MENSAJES[401]); }
+  if (!res.ok) {
+    let msg = '';
+    try { const j = await res.json(); msg = j.error || j.message || ''; } catch {}
+    throw new Error(msg || MENSAJES[res.status] || 'Error ' + res.status);
+  }
+  if (raw) return res;
+  if (res.status === 204) return null;
+  const t = await res.text();
+  try { return t ? JSON.parse(t) : null; } catch { return t; }
+}
+
+function toast(msg, err) {
+  const d = document.createElement('div');
+  d.className = 'toast' + (err ? ' err' : ''); d.textContent = msg;
+  $('#toasts').append(d); setTimeout(() => d.remove(), 4000);
+}
+const run = async (fn, ok) => { try { const r = await fn(); if (ok) toast(ok); return r; } catch (e) { toast(e.message, true); } };
+
+/* ---------- Vistas por rol ---------- */
+const RUTAS = {
+  inicio:      { t: 'Inicio',            roles: ['ADMIN','ENCARGADO','USER'], f: vInicio },
+  equipos:     { t: 'Equipos',           roles: ['ADMIN','ENCARGADO','USER'], f: vEquipos },
+  prestamos:   { t: 'Préstamos activos', roles: ['ADMIN','ENCARGADO'],        f: vPrestamos },
+  solicitantes:{ t: 'Solicitantes',      roles: ['ADMIN','ENCARGADO'],        f: vSolicitantes },
+  reportes:    { t: 'Reportes',          roles: ['ADMIN','ENCARGADO'],        f: vReportes },
+  mios:        { t: 'Mis préstamos',     roles: ['USER'],                     f: vMios },
+  perfil:      { t: 'Mi perfil',         roles: ['ADMIN','ENCARGADO','USER'], f: vPerfil }
+};
+const puede = (...roles) => roles.includes(sesion.user?.rol);
+
+function tabla(cols, filas, vacio = 'No hay datos para mostrar.') {
+  if (!filas.length) return `<div class="tablewrap"><div class="empty">${vacio}</div></div>`;
+  return `<div class="tablewrap"><table><thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${
+    filas.map(f => `<tr>${f.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+const filaPrestamo = (p, extra = '') => [esc(p.id), esc(p.solicitante), esc(p.equipo), fecha(p.fechaPrestamo),
+  fecha(p.fechaDevolucionPrevista), fecha(p.fechaDevolucionReal),
+  badge(p.estado) + (p.vencido && p.estado === 'ACTIVO' ? ' ' + badge('Vencido', 'vencido') : ''), money(p.multa), extra];
+const COLS_P = ['N°','Solicitante','Equipo','Prestado','Vence','Devuelto','Estado','Multa'];
+
+async function vInicio(v) {
+  const staff = puede('ADMIN', 'ENCARGADO');
+  const [eq, act, mios] = await Promise.all([api('/equipos'), staff ? api('/prestamos') : [], staff ? [] : api('/prestamos/mios')]);
+  const n = e => eq.filter(x => x.estado === e).length;
+  const venc = act.filter(p => p.vencido);
+  const stat = (num, lbl, cls = '') => `<div class="stat ${cls}"><b>${num}</b><span>${lbl}</span></div>`;
+  let h = `<section class="hero"><div><h3>Hola, ${esc(sesion.user.usuario)}</h3>
+    <p>${staff ? 'Estado del inventario y de los préstamos de hoy.' : 'Mirá qué equipos hay disponibles y cuándo tenés que devolver los tuyos.'}</p></div>
+    <a class="btn amber" href="#${staff ? (puede('ENCARGADO') ? 'prestamos' : 'equipos') : 'equipos'}">${staff && puede('ENCARGADO') ? 'Registrar un préstamo' : 'Ver equipos'}</a></section>
+    <div class="grid">${stat(eq.length, 'Equipos en inventario')}${stat(n('DISPONIBLE'), 'Disponibles', 'ok')}${stat(n('PRESTADO'), 'Prestados')}${stat(n('EN_REPARACION'), 'En reparación', 'warn')}
+    ${staff ? stat(act.length, 'Préstamos activos') + stat(venc.length, 'Vencidos sin devolver', venc.length ? 'bad' : '') : stat(mios.filter(p => p.estado === 'ACTIVO').length, 'Mis préstamos activos')}</div>`;
+  const lista = staff ? venc : mios.filter(p => p.estado === 'ACTIVO');
+  h += `<h3 class="sec">${staff ? 'Préstamos vencidos' : 'Para devolver'}</h3>` +
+    tabla(['Solicitante','Equipo','Vence'].filter((_, i) => staff || i), lista.map(p => [...(staff ? [esc(p.solicitante)] : []), esc(p.equipo), fecha(p.fechaDevolucionPrevista)]),
+      staff ? 'No hay préstamos vencidos. Todo en orden.' : 'No tenés equipos pendientes de devolución.');
+  v.innerHTML = h;
+}
+
+async function vEquipos(v) {
+  const admin = puede('ADMIN');
+  let todos = [];
+  const pintar = () => {
+    const q = $('#q').value.trim().toLowerCase(), t = $('#tipo').value, solo = $('#solo').checked;
+    const l = todos.filter(e => (!t || e.tipo === t) && (!solo || e.estado === 'DISPONIBLE') &&
+      (!q || [e.codigo, e.marca, e.modelo, e.especificacion].join(' ').toLowerCase().includes(q)));
+    $('#tb').innerHTML = l.length ? `<div class="cards">${l.map(e => `<article class="eq">
+      <div class="eq-ic ${e.estado}">${ICON[e.tipo] || ''}</div>
+      <div class="eq-body"><div class="eq-top"><strong>${esc(e.codigo)}</strong>${badge(e.estado)}</div>
+        <div>${esc(e.marca)} ${esc(e.modelo)}</div><div class="muted">${esc(e.tipo)} · ${esc(e.especificacion) || 'Sin especificación'}</div>
+        ${admin ? `<div class="act">${e.estado === 'DISPONIBLE' ? `<button class="btn sm" data-e="${e.id}" data-s="EN_REPARACION">A reparación</button>` : ''}
+          ${e.estado === 'EN_REPARACION' ? `<button class="btn sm" data-e="${e.id}" data-s="DISPONIBLE">Marcar disponible</button>` : ''}
+          <button class="btn sm danger" data-del="${e.id}">Eliminar</button></div>` : ''}</div></article>`).join('')}</div>`
+      : '<div class="tablewrap"><div class="empty">No hay equipos que coincidan con la búsqueda.</div></div>';
+  };
+  const cargar = async () => { todos = await api('/equipos'); pintar(); };
+  v.innerHTML = (admin ? `<form id="nuevo" class="card"><h3>Registrar equipo</h3><div class="inline">
+    <label>Tipo<select name="tipo"><option>NOTEBOOK</option><option>PROYECTOR</option><option>TABLET</option></select></label>
+    <label>Código<input name="codigo" required></label><label>Marca<input name="marca" required></label>
+    <label>Modelo<input name="modelo" required></label><label>Especificación<input name="especificacion"></label>
+    <button class="btn primary">Registrar equipo</button></div></form>` : '') +
+    `<div class="toolbar"><input id="q" type="search" placeholder="Buscar por código, marca o modelo" aria-label="Buscar equipo">
+    <select id="tipo" aria-label="Tipo"><option value="">Todos los tipos</option><option>NOTEBOOK</option><option>PROYECTOR</option><option>TABLET</option></select>
+    <label class="chk"><input type="checkbox" id="solo">Solo disponibles</label></div><div id="tb"></div>`;
+  ['#q', '#tipo', '#solo'].forEach(s => $(s).oninput = pintar);
+  if (admin) {
+    $('#nuevo').onsubmit = async e => { e.preventDefault();
+      const ok = await run(() => api('/equipos', { method: 'POST', body: Object.fromEntries(new FormData(e.target)) }), 'Equipo registrado.');
+      if (ok) { e.target.reset(); cargar(); } };
+    $('#tb').onclick = async e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.s) await run(() => api(`/equipos/${b.dataset.e}/estado`, { method: 'PUT', body: { estado: b.dataset.s } }), 'Estado actualizado.');
+      else if (b.dataset.del && confirm('¿Eliminar este equipo?')) await run(() => api('/equipos/' + b.dataset.del, { method: 'DELETE' }), 'Equipo eliminado.');
+      else return;
+      cargar();
+    };
+  }
+  cargar();
+}
+
+async function vPrestamos(v) {
+  const enc = puede('ENCARGADO');
+  const cargar = async () => {
+    const l = await api('/prestamos');
+    $('#tb').innerHTML = tabla([...COLS_P, enc ? 'Acción' : ''].filter(Boolean),
+      l.map(p => filaPrestamo(p, enc ? `<button class="btn sm primary" data-dev="${p.id}">Registrar devolución</button>` : '')).map(f => enc ? f : f.slice(0, 8)),
+      'No hay préstamos activos.');
+  };
+  let h = '';
+  if (enc) {
+    const [sol, eq] = await Promise.all([api('/solicitantes'), api('/equipos?soloDisponibles=true')]);
+    h = `<form id="nuevo" class="card"><h3>Registrar préstamo</h3><div class="inline">
+      <label>Solicitante<select name="solicitanteId" required>${sol.map(s => `<option value="${s.idSolicitante}">${esc(s.nombre)} ${esc(s.apellido)} (${esc(s.perfil)})</option>`).join('')}</select></label>
+      <label>Equipo disponible<select name="equipoId" required>${eq.length ? eq.map(e => `<option value="${e.id}">${esc(e.codigo)} - ${esc(e.marca)} ${esc(e.modelo)}</option>`).join('') : '<option value="">No hay equipos disponibles</option>'}</select></label>
+      <button class="btn primary">Registrar préstamo</button></div></form>`;
+  }
+  v.innerHTML = h + '<div id="tb"></div>';
+  if (enc) {
+    $('#nuevo').onsubmit = async e => { e.preventDefault();
+      const d = Object.fromEntries(new FormData(e.target));
+      const ok = await run(() => api('/prestamos/solicitar', { method: 'POST', body: { solicitanteId: +d.solicitanteId, equipoId: +d.equipoId } }), 'Préstamo registrado.');
+      if (ok) vPrestamos(v); };
+    $('#tb').onclick = async e => {
+      const b = e.target.closest('[data-dev]'); if (!b) return;
+      const r = await run(() => api(`/prestamos/${b.dataset.dev}/devolver`, { method: 'POST' }));
+      if (r) { toast(r.multa > 0 ? `Devuelto. Multa: ${money(r.multa)}` : 'Devolución registrada sin multa.'); vPrestamos(v); }
+    };
+  }
+  cargar();
+}
+
+async function vSolicitantes(v) {
+  const admin = puede('ADMIN');
+  const l = await api('/solicitantes');
+  v.innerHTML = tabla(['Usuario','Nombre','Correo','Perfil', admin ? 'Cambiar perfil' : ''].filter(Boolean),
+    l.map(s => [esc(s.username), `${esc(s.nombre)} ${esc(s.apellido)}`, esc(s.email), badge(s.perfil),
+      ...(admin ? [`<select data-s="${s.idSolicitante}" aria-label="Perfil de ${esc(s.username)}">${['ALUMNO','DOCENTE','STAFF'].map(p => `<option ${p === s.perfil ? 'selected' : ''}>${p}</option>`).join('')}</select>`] : [])]));
+  if (admin) v.onchange = async e => {
+    const s = e.target.closest('select[data-s]'); if (!s) return;
+    await run(() => api(`/solicitantes/${s.dataset.s}/perfil`, { method: 'PUT', body: { perfil: s.value } }), 'Perfil actualizado.');
+    vSolicitantes(v);
+  };
+}
+
+async function vReportes(v) {
+  v.innerHTML = `<div class="toolbar"><select id="clave"><option value="vencidos">Vencidos</option><option value="activos">Activos</option><option value="historial">Historial</option></select>
+    <button class="btn" id="csv">Descargar CSV</button></div><div id="rep"></div>`;
+  const ver = async () => {
+    const r = await api('/reportes/' + $('#clave').value);
+    $('#rep').innerHTML = `<h3>${esc(r.titulo)}</h3>` + tabla(r.encabezados.map(esc), r.filas.map(f => f.map(esc)), 'No hay registros en este reporte.');
+  };
+  $('#clave').onchange = () => run(ver);
+  $('#csv').onclick = () => run(async () => {
+    const c = $('#clave').value, res = await api(`/reportes/${c}/csv`, { raw: true });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(await res.blob()); a.download = `reporte-${c}.csv`; a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  run(ver);
+}
+
+async function vMios(v) {
+  const l = await api('/prestamos/mios');
+  v.innerHTML = tabla(COLS_P, l.map(p => filaPrestamo(p)), 'Todavía no tenés préstamos.');
+}
+
+async function vPerfil(v) {
+  const s = await api('/solicitantes/me').catch(() => null);
+  const pol = { ALUMNO: '3 días de plazo. Multa de $500 por cada día de atraso.', DOCENTE: '7 días de plazo. Multa fija de $2.000 si hay atraso.', STAFF: '7 días de plazo. Sin multa.' };
+  v.innerHTML = `<div class="card"><h3>${esc(sesion.user.usuario)} ${badge(sesion.user.rol)}</h3>` + (s
+    ? `<p>${esc(s.nombre)} ${esc(s.apellido)}<br><span class="muted">${esc(s.email)}</span></p><p>Perfil: ${badge(s.perfil)}</p><p class="muted">${pol[s.perfil] || ''}</p>`
+    : '<p class="muted">Esta cuenta no tiene un perfil de solicitante asociado.</p>') + '</div>';
+}
+
+/* ---------- Navegación ---------- */
+function ruta() {
+  const k = location.hash.slice(1), r = RUTAS[k];
+  if (!r || !r.roles.includes(sesion.user.rol)) { location.hash = '#inicio'; return; }
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.k === k));
+  $('#title').textContent = r.t;
+  const v = $('#view'); v.innerHTML = ''; v.onclick = v.onchange = null;
+  r.f(v).catch(e => { v.innerHTML = `<div class="card"><p class="msg">${esc(e.message)}</p></div>`; });
+}
+
+function mostrarApp() {
+  const u = sesion.user;
+  $('#auth').hidden = true; $('#app').hidden = false;
+  $('#who-name').textContent = u.usuario; $('#avatar').textContent = u.usuario.slice(0, 2).toUpperCase(); $('#who-role').textContent = u.rol;
+  $('#nav').innerHTML = Object.entries(RUTAS).filter(([, r]) => r.roles.includes(u.rol))
+    .map(([k, r]) => `<a href="#${k}" data-k="${k}">${ICON[k]}<span>${r.t}</span></a>`).join('');
+  ruta();
+}
+
+function salir(vencida) {
+  if (sesion.token && !vencida) fetch('/api/auth/logout', { method: 'POST', headers: { Authorization: 'Bearer ' + sesion.token } }).catch(() => {});
+  sesion.clear(); location.hash = '';
+  $('#app').hidden = true; $('#auth').hidden = false;
+  $('#auth-msg').textContent = vencida ? 'Tu sesión venció. Ingresá de nuevo.' : '';
+}
+
+/* ---------- Autenticación ---------- */
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t === b));
+  $('#f-login').hidden = b.dataset.t !== 'login'; $('#f-signup').hidden = b.dataset.t !== 'signup'; $('#auth-msg').textContent = '';
+});
+async function ingresar(username, password) {
+  const r = await api('/api/auth/signin', { method: 'POST', body: { username, password } });
+  sesion.set(r.token, { usuario: r.usuario, rol: r.rol });
+  location.hash = '#inicio'; mostrarApp();
+}
+$('#f-login').onsubmit = async e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target));
+  try { await ingresar(d.username, d.password); } catch (x) { $('#auth-msg').textContent = x.message; } };
+$('#f-signup').onsubmit = async e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target));
+  try { await api('/api/auth/signup', { method: 'POST', body: d }); await ingresar(d.username, d.password); }
+  catch (x) { $('#auth-msg').textContent = x.message; } };
+$('#logout').onclick = () => salir(false);
+window.addEventListener('hashchange', () => sesion.token && ruta());
+
+if (sesion.token && sesion.user) mostrarApp(); else $('#auth').hidden = false;
+</script>
+</body>
+</html>
